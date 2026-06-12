@@ -4,6 +4,6 @@ export { useCategories, useCategory } from "./categories.queries";
 export {
   useCreateCategory,
   useUpdateCategory,
-  useDeleteCategory,
+  useDeactivateCategory,
   useReactivateCategory,
 } from "./categories.mutations";

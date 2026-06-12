@@ -11,7 +11,7 @@ import { CategoriesTable } from "../components/CategoriesTable";
 import { CategoriesTableSkeleton } from "../components/CategoriesTableSkeleton";
 import { CategoryFormSheet } from "../components/CategoryFormSheet";
 import {
-  useDeleteCategory,
+  useDeactivateCategory,
   useReactivateCategory,
 } from "../categories.mutations";
 import { useCategories } from "../categories.queries";
@@ -36,7 +36,7 @@ export default function CategoriesPage() {
     pageSize: PAGE_SIZE,
     active: status === "all" ? undefined : status === "active",
   });
-  const deactivateMutation = useDeleteCategory();
+  const deactivateMutation = useDeactivateCategory();
   const reactivateMutation = useReactivateCategory();
 
   const categories = categoriesQuery.data?.data ?? [];
@@ -59,14 +59,15 @@ export default function CategoriesPage() {
     setDeactivateTarget(category);
   }
 
-  async function confirmDeactivate() {
+  function confirmDeactivate() {
     if (!deactivateTarget) return;
-    try {
-      await deactivateMutation.mutateAsync(deactivateTarget.id);
-      setDeactivateTarget(null);
-    } catch {
-      // erro tratado via toast global
-    }
+    deactivateMutation.mutate(deactivateTarget.id, {
+      onSuccess: () => {
+        // Fecha o dialog de confirmação e o modal de edição (se aberto).
+        setDeactivateTarget(null);
+        setFormOpen(false);
+      },
+    });
   }
 
   // Reativação: fecha a edição e dispara a mutation (interface preparada).

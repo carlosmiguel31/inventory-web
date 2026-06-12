@@ -38,12 +38,16 @@ export function useUpdateCategory() {
   });
 }
 
-/** Inativação lógica: DELETE /api/categories/:id. */
-export function useDeleteCategory() {
+/**
+ * Inativação (soft delete): marca a categoria como inativa via
+ * PATCH /api/categories/:id { active: false }. O registro permanece e passa a
+ * aparecer no filtro "Inativas" (DELETE removeria o registro definitivamente).
+ */
+export function useDeactivateCategory() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (id: string) => categoriesService.remove(id),
+    mutationFn: (id: string) => categoriesService.update(id, { active: false }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories.lists() });
       toast({
