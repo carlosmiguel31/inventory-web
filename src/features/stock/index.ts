@@ -1,3 +1,15 @@
-export type { StockMovement, StockMovementType, CreateStockMovementDTO } from "./stock.types";
+export type {
+  StockMovement,
+  StockMovementType,
+  CreateStockMovementInput,
+  StockMovementFilters,
+} from "./stock.types";
+export {
+  MOVEMENT_TYPE_LABELS,
+  MOVEMENT_TYPE_OPTIONS,
+  movementDirection,
+  requiresNote,
+} from "./stock.constants";
 export { stockService } from "./stock.service";
-export { useStock } from "./stock.queries";
+export { useStockMovements } from "./stock.queries";
+export { useCreateStockMovement } from "./stock.mutations";

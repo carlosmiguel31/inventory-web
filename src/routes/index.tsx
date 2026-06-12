@@ -11,11 +11,17 @@ import { Login } from "@/pages/Login";
 
 // Páginas de módulo carregadas sob demanda (code splitting).
 const ProductsPage = lazy(() => import("@/features/products/pages/ProductsPage"));
-const StockPage = lazy(() => import("@/features/stock/pages/StockPage"));
+const StockMovementsPage = lazy(
+  () => import("@/features/stock/pages/StockMovementsPage"),
+);
+const StockNewMovementPage = lazy(
+  () => import("@/features/stock/pages/StockNewMovementPage"),
+);
 const SuppliersPage = lazy(() => import("@/features/suppliers/pages/SuppliersPage"));
 const CategoriesPage = lazy(() => import("@/features/categories/pages/CategoriesPage"));
 const UsersPage = lazy(() => import("@/features/users/pages/UsersPage"));
 const ReportsPage = lazy(() => import("@/features/reports/pages/ReportsPage"));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 
 /** Envolve um elemento lazy com Suspense + fallback de carregamento. */
 function lazyElement(node: ReactNode) {
@@ -51,11 +57,14 @@ export const router = createBrowserRouter([
 
           // Módulos de negócio (infra pronta; CRUD a implementar).
           { path: "products", element: lazyElement(<ProductsPage />) },
-          { path: "stock", element: lazyElement(<StockPage />) },
+          { path: "stock", element: <Navigate to="/stock/movements" replace /> },
+          { path: "stock/movements", element: lazyElement(<StockMovementsPage />) },
+          { path: "stock/new", element: lazyElement(<StockNewMovementPage />) },
           { path: "suppliers", element: lazyElement(<SuppliersPage />) },
           { path: "categories", element: lazyElement(<CategoriesPage />) },
           { path: "users", element: lazyElement(<UsersPage />) },
           { path: "reports", element: lazyElement(<ReportsPage />) },
+          { path: "settings", element: lazyElement(<SettingsPage />) },
 
           // Aliases PT -> EN: mantêm os links atuais da Sidebar funcionando
           // sem precisar alterá-la.
@@ -65,6 +74,7 @@ export const router = createBrowserRouter([
           { path: "categorias", element: <Navigate to="/categories" replace /> },
           { path: "usuarios", element: <Navigate to="/users" replace /> },
           { path: "relatorios", element: <Navigate to="/reports" replace /> },
+          { path: "configuracoes", element: <Navigate to="/settings" replace /> },
         ],
       },
       {

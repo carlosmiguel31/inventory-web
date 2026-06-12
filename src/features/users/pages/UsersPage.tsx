@@ -5,6 +5,7 @@ export default function UsersPage() {
     <ModulePlaceholder
       title="Usuários"
       description="Gestão de usuários e permissões."
+      breadcrumb={[{ label: "Início", to: "/" }, { label: "Usuários" }]}
     />
   );
 }

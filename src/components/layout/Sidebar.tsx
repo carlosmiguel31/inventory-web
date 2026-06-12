@@ -28,7 +28,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         <p className="px-3 pb-1 pt-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Geral
         </p>
-        {navItems.map(({ label, to, icon: Icon, soon }) => (
+        {navItems.map(({ label, to, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -54,11 +54,6 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                   )}
                 />
                 <span className="truncate">{label}</span>
-                {soon && (
-                  <span className="ml-auto rounded bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    em breve
-                  </span>
-                )}
               </>
             )}
           </NavLink>

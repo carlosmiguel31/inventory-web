@@ -5,6 +5,7 @@ export default function ReportsPage() {
     <ModulePlaceholder
       title="Relatórios"
       description="Indicadores e relatórios do estoque."
+      breadcrumb={[{ label: "Início", to: "/" }, { label: "Relatórios" }]}
     />
   );
 }

@@ -5,6 +5,7 @@ export default function CategoriesPage() {
     <ModulePlaceholder
       title="Categorias"
       description="Organização dos produtos por categoria."
+      breadcrumb={[{ label: "Início", to: "/" }, { label: "Categorias" }]}
     />
   );
 }

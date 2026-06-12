@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/lib/query-keys";
-import type { ListParams } from "@/types/common";
 import { stockService } from "./stock.service";
+import type { StockMovementFilters } from "./stock.types";
 
-/** Histórico de movimentações (read-only). */
-export function useStock(params?: ListParams) {
+export function useStockMovements(filters?: StockMovementFilters) {
   return useQuery({
-    queryKey: queryKeys.stock.list(params),
-    queryFn: () => stockService.list(params),
+    queryKey: queryKeys.stock.list({ ...filters }),
+    queryFn: () => stockService.listMovements(filters),
   });
 }
