@@ -61,8 +61,11 @@ function toApiQuery(params?: ListParams): Record<string, unknown> {
   if (!params) return query;
   if (params.page !== undefined) query.page = params.page;
   if (params.pageSize !== undefined) query.limit = params.pageSize;
-  // TODO(backend): confirmar o parâmetro de busca suportado (assumido: name).
-  if (params.search) query.name = params.search;
+  // Busca por nome do fornecedor. O endpoint de fornecedores não filtra por
+  // `name` (esse é o param do módulo de Produtos); usa o genérico `search`.
+  // TODO(backend): confirmar no Swagger. Se for outro nome (q/term/filter),
+  // trocar apenas esta linha.
+  if (params.search) query.search = params.search;
   return query;
 }
 
