@@ -7,12 +7,14 @@ import type {
 } from "./categories.types";
 
 /**
- * Endpoints assumidos (ajuste em um único lugar se o Swagger divergir):
- *   GET    /api/categories        (page, limit)
+ * Rotas de categorias usadas pelo frontend hoje:
+ *   GET    /api/categories        (page, limit, active)
  *   GET    /api/categories/:id
  *   POST   /api/categories
- *   PATCH  /api/categories/:id    (edição/reativação)
- *   DELETE /api/categories/:id    (inativação lógica)
+ *   PATCH  /api/categories/:id     (edição de nome/código)
+ *   DELETE /api/categories/:id
+ *
+ * NÃO existe rota de inativação/reativação no backend (ver TODO abaixo).
  */
 const RESOURCE = "/api/categories";
 
@@ -82,18 +84,11 @@ export const categoriesService = {
     return fromApi(data);
   },
 
-  /**
-   * Inativação por endpoint dedicado: PATCH /api/categories/:id/deactivate.
-   * (O backend NÃO possui PATCH /api/categories/:id para alterar status.)
-   */
-  deactivate: async (id: string | number): Promise<void> => {
-    await api.patch(`${RESOURCE}/${id}/deactivate`);
-  },
-
-  /** Reativação por endpoint dedicado: PATCH /api/categories/:id/activate. */
-  activate: async (id: string | number): Promise<void> => {
-    await api.patch(`${RESOURCE}/${id}/activate`);
-  },
+  // TODO(backend): não existe endpoint de inativação/reativação de categorias.
+  // Os testes reais retornam { "status": "error", "message": "Rota não encontrada" }
+  // para PATCH /api/categories/:id, PATCH /api/categories/:id/deactivate e
+  // PATCH /api/categories/:id/activate. Quando o backend expuser a rota correta,
+  // adicionar aqui (ex.: deactivate/activate) e reativar a UI correspondente.
 
   remove: async (id: string | number): Promise<void> => {
     await api.delete(`${RESOURCE}/${id}`);

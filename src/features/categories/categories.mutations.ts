@@ -38,38 +38,8 @@ export function useUpdateCategory() {
   });
 }
 
-/**
- * Inativação: endpoint dedicado PATCH /api/categories/:id/deactivate.
- */
-export function useDeactivateCategory() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  return useMutation({
-    mutationFn: (id: string) => categoriesService.deactivate(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.categories.lists() });
-      toast({
-        title: "Categoria inativada",
-        description: "A categoria foi inativada com sucesso.",
-        variant: "success",
-      });
-    },
-  });
-}
-
-/** Reativação: endpoint dedicado PATCH /api/categories/:id/activate. */
-export function useReactivateCategory() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  return useMutation({
-    mutationFn: (id: string) => categoriesService.activate(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.categories.lists() });
-      toast({
-        title: "Categoria reativada",
-        description: "A categoria está ativa novamente.",
-        variant: "success",
-      });
-    },
-  });
-}
+// TODO(backend): inativação/reativação de categorias está desabilitada porque o
+// backend não possui a rota correspondente (retorna "Rota não encontrada").
+// Quando o endpoint existir, recriar aqui useDeactivateCategory /
+// useReactivateCategory chamando categoriesService e reativar os botões na UI
+// (CategoriesTable e CategoryFormSheet) e o ConfirmDialog em CategoriesPage.

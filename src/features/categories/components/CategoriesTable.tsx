@@ -1,4 +1,4 @@
-import { Ban, MoreHorizontal, Pencil, RotateCcw } from "lucide-react";
+import { MoreHorizontal, Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,16 +22,11 @@ import { formatDate } from "../categories.utils";
 interface CategoriesTableProps {
   categories: Category[];
   onEdit: (category: Category) => void;
-  onDeactivate: (category: Category) => void;
-  onReactivate: (category: Category) => void;
+  // TODO(backend): reintroduzir onDeactivate/onReactivate quando houver
+  // endpoint de inativação/reativação de categorias.
 }
 
-export function CategoriesTable({
-  categories,
-  onEdit,
-  onDeactivate,
-  onReactivate,
-}: CategoriesTableProps) {
+export function CategoriesTable({ categories, onEdit }: CategoriesTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -75,20 +70,6 @@ export function CategoriesTable({
                     <Pencil />
                     Editar
                   </DropdownMenuItem>
-                  {category.active ? (
-                    <DropdownMenuItem
-                      className="text-destructive focus:text-destructive"
-                      onClick={() => onDeactivate(category)}
-                    >
-                      <Ban />
-                      Inativar
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem onClick={() => onReactivate(category)}>
-                      <RotateCcw />
-                      Reativar
-                    </DropdownMenuItem>
-                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>

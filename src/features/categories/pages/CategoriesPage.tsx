@@ -6,14 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { ConfirmDialog, EmptyState, ErrorState } from "@/components/states";
+import { EmptyState, ErrorState } from "@/components/states";
 import { CategoriesTable } from "../components/CategoriesTable";
 import { CategoriesTableSkeleton } from "../components/CategoriesTableSkeleton";
 import { CategoryFormSheet } from "../components/CategoryFormSheet";
-import {
-  useDeactivateCategory,
-  useReactivateCategory,
-} from "../categories.mutations";
 import { useCategories } from "../categories.queries";
 import type { Category } from "../categories.types";
 
@@ -24,7 +20,6 @@ export default function CategoriesPage() {
   const [status, setStatus] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
-  const [deactivateTarget, setDeactivateTarget] = useState<Category | null>(null);
 
   function changeStatus(value: string) {
     setStatus(value);
@@ -36,8 +31,6 @@ export default function CategoriesPage() {
     pageSize: PAGE_SIZE,
     active: status === "all" ? undefined : status === "active",
   });
-  const deactivateMutation = useDeactivateCategory();
-  const reactivateMutation = useReactivateCategory();
 
   const categories = categoriesQuery.data?.data ?? [];
   const meta = categoriesQuery.data?.meta;
@@ -51,29 +44,6 @@ export default function CategoriesPage() {
   function openEdit(category: Category) {
     setEditing(category);
     setFormOpen(true);
-  }
-
-  // Inativação: mesmo fluxo do menu (DELETE). Fecha a edição e abre a confirmação.
-  function requestDeactivate(category: Category) {
-    setFormOpen(false);
-    setDeactivateTarget(category);
-  }
-
-  function confirmDeactivate() {
-    if (!deactivateTarget) return;
-    deactivateMutation.mutate(deactivateTarget.id, {
-      onSuccess: () => {
-        // Fecha o dialog de confirmação e o modal de edição (se aberto).
-        setDeactivateTarget(null);
-        setFormOpen(false);
-      },
-    });
-  }
-
-  // Reativação: fecha a edição e dispara a mutation (interface preparada).
-  function handleReactivate(category: Category) {
-    setFormOpen(false);
-    reactivateMutation.mutate(category.id);
   }
 
   return (
@@ -95,7 +65,7 @@ export default function CategoriesPage() {
         </div>
       </div>
 
-      {/* Filtro de status */}
+      {/* Filtro de status (listagem) */}
       <div className="flex items-end gap-2">
         <div className="w-full space-y-1.5 sm:w-52">
           <Label className="text-xs text-muted-foreground">Status</Label>
@@ -135,12 +105,7 @@ export default function CategoriesPage() {
               className="border-0"
             />
           ) : (
-            <CategoriesTable
-              categories={categories}
-              onEdit={openEdit}
-              onDeactivate={setDeactivateTarget}
-              onReactivate={handleReactivate}
-            />
+            <CategoriesTable categories={categories} onEdit={openEdit} />
           )}
         </CardContent>
       </Card>
@@ -178,28 +143,11 @@ export default function CategoriesPage() {
           </div>
         )}
 
-      {/* Modais */}
+      {/* Modal de cadastro/edição */}
       <CategoryFormSheet
         open={formOpen}
         onOpenChange={setFormOpen}
         category={editing}
-        onRequestDeactivate={requestDeactivate}
-        onRequestReactivate={handleReactivate}
-      />
-
-      <ConfirmDialog
-        open={Boolean(deactivateTarget)}
-        onOpenChange={(open) => !open && setDeactivateTarget(null)}
-        title="Inativar categoria"
-        description={
-          deactivateTarget
-            ? `Tem certeza que deseja inativar "${deactivateTarget.name}"? Você poderá reativá-la depois.`
-            : undefined
-        }
-        confirmLabel="Inativar"
-        destructive
-        loading={deactivateMutation.isPending}
-        onConfirm={confirmDeactivate}
       />
     </div>
   );
