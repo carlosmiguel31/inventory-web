@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight, Plus, Tags } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { ConfirmDialog, EmptyState, ErrorState } from "@/components/states";
 import { CategoriesTable } from "../components/CategoriesTable";
 import { CategoriesTableSkeleton } from "../components/CategoriesTableSkeleton";
@@ -19,11 +21,21 @@ const PAGE_SIZE = 10;
 
 export default function CategoriesPage() {
   const [page, setPage] = useState(1);
+  const [status, setStatus] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Category | null>(null);
 
-  const categoriesQuery = useCategories({ page, pageSize: PAGE_SIZE });
+  function changeStatus(value: string) {
+    setStatus(value);
+    setPage(1);
+  }
+
+  const categoriesQuery = useCategories({
+    page,
+    pageSize: PAGE_SIZE,
+    active: status === "all" ? undefined : status === "active",
+  });
   const deactivateMutation = useDeleteCategory();
   const reactivateMutation = useReactivateCategory();
 
@@ -41,6 +53,12 @@ export default function CategoriesPage() {
     setFormOpen(true);
   }
 
+  // Inativação: mesmo fluxo do menu (DELETE). Fecha a edição e abre a confirmação.
+  function requestDeactivate(category: Category) {
+    setFormOpen(false);
+    setDeactivateTarget(category);
+  }
+
   async function confirmDeactivate() {
     if (!deactivateTarget) return;
     try {
@@ -51,7 +69,9 @@ export default function CategoriesPage() {
     }
   }
 
+  // Reativação: fecha a edição e dispara a mutation (interface preparada).
   function handleReactivate(category: Category) {
+    setFormOpen(false);
     reactivateMutation.mutate(category.id);
   }
 
@@ -74,6 +94,22 @@ export default function CategoriesPage() {
         </div>
       </div>
 
+      {/* Filtro de status */}
+      <div className="flex items-end gap-2">
+        <div className="w-full space-y-1.5 sm:w-52">
+          <Label className="text-xs text-muted-foreground">Status</Label>
+          <Select
+            value={status}
+            onChange={(e) => changeStatus(e.target.value)}
+            aria-label="Filtrar por status"
+          >
+            <option value="all">Todas</option>
+            <option value="active">Ativas</option>
+            <option value="inactive">Inativas</option>
+          </Select>
+        </div>
+      </div>
+
       {/* Conteúdo */}
       <Card>
         <CardContent className="p-0">
@@ -90,7 +126,11 @@ export default function CategoriesPage() {
             <EmptyState
               icon={Tags}
               title="Nenhuma categoria encontrada"
-              description="Cadastre a primeira categoria para começar."
+              description={
+                status !== "all"
+                  ? "Tente ajustar o filtro de status."
+                  : "Cadastre a primeira categoria para começar."
+              }
               className="border-0"
             />
           ) : (
@@ -142,6 +182,8 @@ export default function CategoriesPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         category={editing}
+        onRequestDeactivate={requestDeactivate}
+        onRequestReactivate={handleReactivate}
       />
 
       <ConfirmDialog

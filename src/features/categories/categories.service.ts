@@ -49,6 +49,7 @@ function toApiQuery(params?: ListParams): Record<string, unknown> {
   if (!params) return query;
   if (params.page !== undefined) query.page = params.page;
   if (params.pageSize !== undefined) query.limit = params.pageSize;
+  if (params.active !== undefined) query.active = params.active;
   return query;
 }
 
