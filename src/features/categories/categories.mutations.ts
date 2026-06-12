@@ -39,15 +39,13 @@ export function useUpdateCategory() {
 }
 
 /**
- * Inativação (soft delete): marca a categoria como inativa via
- * PATCH /api/categories/:id { active: false }. O registro permanece e passa a
- * aparecer no filtro "Inativas" (DELETE removeria o registro definitivamente).
+ * Inativação: endpoint dedicado PATCH /api/categories/:id/deactivate.
  */
 export function useDeactivateCategory() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (id: string) => categoriesService.update(id, { active: false }),
+    mutationFn: (id: string) => categoriesService.deactivate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories.lists() });
       toast({
@@ -59,12 +57,12 @@ export function useDeactivateCategory() {
   });
 }
 
-/** Reativação via PATCH { active: true }. */
+/** Reativação: endpoint dedicado PATCH /api/categories/:id/activate. */
 export function useReactivateCategory() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (id: string) => categoriesService.update(id, { active: true }),
+    mutationFn: (id: string) => categoriesService.activate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories.lists() });
       toast({

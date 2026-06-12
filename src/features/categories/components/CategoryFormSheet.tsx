@@ -75,17 +75,16 @@ export function CategoryFormSheet({
     }
     setError(null);
 
-    const payload = {
-      name: form.name.trim(),
-      code: form.code.trim() || undefined,
-      active: form.active,
-    };
+    const name = form.name.trim();
+    const code = form.code.trim() || undefined;
 
     try {
       if (category) {
-        await updateMutation.mutateAsync({ id: category.id, payload });
+        // Status na edição é alterado pelos botões Inativar/Reativar
+        // (endpoints dedicados), não pelo update geral.
+        await updateMutation.mutateAsync({ id: category.id, payload: { name, code } });
       } else {
-        await createMutation.mutateAsync(payload);
+        await createMutation.mutateAsync({ name, code, active: form.active });
       }
       onOpenChange(false);
     } catch {
@@ -128,17 +127,19 @@ export function CategoryFormSheet({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="active">Status</Label>
-            <Select
-              id="active"
-              value={form.active ? "true" : "false"}
-              onChange={(e) => setField("active", e.target.value === "true")}
-            >
-              <option value="true">Ativo</option>
-              <option value="false">Inativo</option>
-            </Select>
-          </div>
+          {!isEdit && (
+            <div className="space-y-2">
+              <Label htmlFor="active">Status</Label>
+              <Select
+                id="active"
+                value={form.active ? "true" : "false"}
+                onChange={(e) => setField("active", e.target.value === "true")}
+              >
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </Select>
+            </div>
+          )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 

@@ -82,6 +82,19 @@ export const categoriesService = {
     return fromApi(data);
   },
 
+  /**
+   * Inativação por endpoint dedicado: PATCH /api/categories/:id/deactivate.
+   * (O backend NÃO possui PATCH /api/categories/:id para alterar status.)
+   */
+  deactivate: async (id: string | number): Promise<void> => {
+    await api.patch(`${RESOURCE}/${id}/deactivate`);
+  },
+
+  /** Reativação por endpoint dedicado: PATCH /api/categories/:id/activate. */
+  activate: async (id: string | number): Promise<void> => {
+    await api.patch(`${RESOURCE}/${id}/activate`);
+  },
+
   remove: async (id: string | number): Promise<void> => {
     await api.delete(`${RESOURCE}/${id}`);
   },
