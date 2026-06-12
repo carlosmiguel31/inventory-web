@@ -10,5 +10,13 @@ export interface Supplier extends Timestamps {
   active: boolean;
 }
 
-export type CreateSupplierDTO = Omit<Supplier, "id" | "createdAt" | "updatedAt">;
+/** Status (active) não é enviado no cadastro: o backend define o padrão. */
+export interface CreateSupplierDTO {
+  name: string;
+  email?: string;
+  phone?: string;
+  document?: string;
+  address?: string;
+}
+
 export type UpdateSupplierDTO = Partial<CreateSupplierDTO>;
