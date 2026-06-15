@@ -30,13 +30,18 @@ const LG_COLS: Record<number, string> = {
 };
 
 export default function ReportsPage() {
-  const [stockFilter, setStockFilter] = useState<LowStockFilter>("all");
+  const [stockFilter, setStockFilter] = useState<LowStockFilter>("active");
 
   const summaryQuery = useReportsSummary();
-  const lowStockQuery = useLowStock(stockFilter);
+  // Card de alerta operacional: SEMPRE apenas produtos ativos, independente do
+  // filtro da tabela. (Quando a tabela também está em "active", o React Query
+  // reaproveita o mesmo cache — sem requisição duplicada.)
+  const activeLowStockQuery = useLowStock("active");
+  // Tabela: segue o filtro escolhido pelo usuário.
+  const tableQuery = useLowStock(stockFilter);
 
   const summary = summaryQuery.data;
-  const lowStockCount = lowStockQuery.data?.length ?? null;
+  const lowStockCount = activeLowStockQuery.data?.length ?? null;
 
   const cards = [
     {
@@ -68,7 +73,7 @@ export default function ReportsPage() {
       label: "Estoque Baixo",
       value: lowStockCount,
       icon: AlertTriangle,
-      loading: lowStockQuery.isLoading,
+      loading: activeLowStockQuery.isLoading,
       highlight: true,
     },
     {
@@ -139,16 +144,16 @@ export default function ReportsPage() {
 
         <Card>
           <CardContent className="p-0">
-            {lowStockQuery.isLoading ? (
+            {tableQuery.isLoading ? (
               <LowStockTableSkeleton />
-            ) : lowStockQuery.isError ? (
+            ) : tableQuery.isError ? (
               <ErrorState
                 title="Não foi possível carregar o estoque baixo"
                 description="Verifique sua conexão com a API e tente novamente."
-                onRetry={() => lowStockQuery.refetch()}
+                onRetry={() => tableQuery.refetch()}
                 className="border-0"
               />
-            ) : !lowStockQuery.data || lowStockQuery.data.length === 0 ? (
+            ) : !tableQuery.data || tableQuery.data.length === 0 ? (
               <EmptyState
                 icon={AlertTriangle}
                 title="Nenhum produto com estoque baixo"
@@ -156,7 +161,7 @@ export default function ReportsPage() {
                 className="border-0"
               />
             ) : (
-              <LowStockTable items={lowStockQuery.data} />
+              <LowStockTable items={tableQuery.data} />
             )}
           </CardContent>
         </Card>
