@@ -1,29 +1,22 @@
 import type { ID } from "@/types/common";
 
-export interface InventorySummary {
-  totalProducts: number;
-  totalStockValue: number;
-  lowStockCount: number;
-  activeSkus: number;
+/**
+ * Resumo derivado das listagens reais (cada número vem do meta.total do
+ * respectivo endpoint). `null` = aquele dado não pôde ser obtido da API.
+ */
+export interface ReportsSummary {
+  totalProducts: number | null;
+  activeProducts: number | null;
+  inactiveProducts: number | null;
+  totalCategories: number | null;
+  totalSuppliers: number | null;
+  totalUsers: number | null;
 }
 
 export interface LowStockItem {
-  productId: ID;
-  sku: string;
+  id: ID;
   name: string;
-  quantity: number;
-  minQuantity: number;
-}
-
-export interface MovementSeriesPoint {
-  date: string;
-  in: number;
-  out: number;
-}
-
-/** Visão consolidada usada na tela de relatórios. */
-export interface Report {
-  summary: InventorySummary;
-  lowStock: LowStockItem[];
-  movements: MovementSeriesPoint[];
+  sku: string;
+  quantity: number; // estoque atual
+  minQuantity: number; // estoque mínimo
 }
