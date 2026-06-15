@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { CheckCircle2, Info, TriangleAlert, X } from "lucide-react";
 
+import { setApiErrorToast } from "@/lib/axios";
 import { setQueryErrorHandler } from "@/lib/query-error-handler";
 import { cn } from "@/lib/utils";
 import { getApiErrorMessage } from "@/utils/errors";
@@ -68,13 +69,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     [dismiss],
   );
 
-  // Liga os erros do React Query (queries e mutations) a um toast global,
-  // com mensagem padronizada por status e de-duplicação de erros idênticos.
+  // Toast global de erros, padronizado por status e de-duplicado.
+  // Registrado em duas pontas que convergem para a MESMA função:
+  //  - interceptor do Axios (captura todo erro de resposta, inclusive envelope 2xx);
+  //  - React Query (erros de query/mutation, incluindo os não-Axios).
+  // A janela de de-dup garante um único toast por erro.
   useEffect(() => {
-    setQueryErrorHandler((error) => {
+    const showError = (error: unknown) => {
       const description = getApiErrorMessage(error);
       const now = Date.now();
-      // Evita dois toasts para o mesmo erro em sequência (janela de 4s).
       if (
         lastError.current.message === description &&
         now - lastError.current.at < 4000
@@ -83,8 +86,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       }
       lastError.current = { message: description, at: now };
       toast({ title: "Erro", description, variant: "error" });
-    });
-    return () => setQueryErrorHandler(null);
+    };
+
+    setApiErrorToast(showError);
+    setQueryErrorHandler(showError);
+    return () => {
+      setApiErrorToast(null);
+      setQueryErrorHandler(null);
+    };
   }, [toast]);
 
   return (
