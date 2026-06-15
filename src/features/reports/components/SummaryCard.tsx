@@ -30,14 +30,16 @@ export function SummaryCard({
           <p className="truncate text-sm text-muted-foreground">{label}</p>
           {loading ? (
             <Skeleton className="mt-1 h-7 w-12" />
+          ) : value === null ? (
+            <p className="mt-1 text-sm text-muted-foreground">Indisponível</p>
           ) : (
             <p
               className={cn(
                 "text-2xl font-semibold",
-                highlight && value && value > 0 && "text-destructive",
+                highlight && value > 0 && "text-destructive",
               )}
             >
-              {value ?? "—"}
+              {value}
             </p>
           )}
         </div>

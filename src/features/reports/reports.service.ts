@@ -48,7 +48,11 @@ export const reportsService = {
 
     const totalOf = (i: number): number | null => {
       const r = results[i] as PromiseSettledResult<Paginated<unknown>>;
-      return r.status === "fulfilled" ? r.value.meta.total : null;
+      if (r.status !== "fulfilled") return null;
+      // Endpoint pode responder sem `meta` (ou meta sem total): nesse caso o
+      // dado é considerado indisponível, sem quebrar os demais cards.
+      const total = r.value?.meta?.total;
+      return typeof total === "number" ? total : null;
     };
 
     return {

@@ -41,15 +41,8 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Cards de resumo */}
-      {summaryQuery.isError ? (
-        <ErrorState
-          title="Não foi possível carregar os indicadores"
-          description="Verifique sua conexão com a API e tente novamente."
-          onRetry={() => summaryQuery.refetch()}
-        />
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Cards de resumo — cada card é independente; dado ausente => "Indisponível" */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryCard
             label="Total de Produtos"
             value={summary?.totalProducts ?? null}
@@ -94,7 +87,6 @@ export default function ReportsPage() {
             loading={summaryQuery.isLoading}
           />
         </div>
-      )}
 
       {/* Relatório de estoque baixo */}
       <div className="space-y-3">
