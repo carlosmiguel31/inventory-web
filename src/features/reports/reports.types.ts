@@ -1,15 +1,16 @@
 import type { ID } from "@/types/common";
 
+export type LowStockFilter = "all" | "active" | "inactive";
+
 /**
- * Resumo derivado das listagens reais (cada número vem do meta.total do
- * respectivo endpoint). `null` = aquele dado não pôde ser obtido da API.
+ * Indicadores derivados de endpoints reais. Apenas os calculáveis de forma
+ * confiável hoje: produtos (via meta.total) e usuários. `null` = indisponível
+ * (o card correspondente é ocultado na UI, nunca exibido como "Indisponível").
  */
 export interface ReportsSummary {
   totalProducts: number | null;
   activeProducts: number | null;
   inactiveProducts: number | null;
-  totalCategories: number | null;
-  totalSuppliers: number | null;
   totalUsers: number | null;
 }
 
