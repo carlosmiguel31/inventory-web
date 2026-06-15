@@ -3,7 +3,7 @@ import { CheckCircle2, Info, TriangleAlert, X } from "lucide-react";
 
 import { setQueryErrorHandler } from "@/lib/query-error-handler";
 import { cn } from "@/lib/utils";
-import { getErrorMessage } from "@/utils/errors";
+import { getApiErrorMessage } from "@/utils/errors";
 import {
   ToastContext,
   type ToastInput,
@@ -32,6 +32,11 @@ const VARIANT_ICON_COLOR: Record<ToastVariant, string> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const timers = useRef<Record<string, number>>({});
+  // Para de-duplicar erros idênticos (ex.: várias queries falhando com 401).
+  const lastError = useRef<{ message: string; at: number }>({
+    message: "",
+    at: 0,
+  });
 
   const dismiss = useCallback((id: string) => {
     setToasts((current) => current.filter((t) => t.id !== id));
@@ -63,11 +68,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     [dismiss],
   );
 
-  // Liga os erros do React Query a um toast global.
+  // Liga os erros do React Query (queries e mutations) a um toast global,
+  // com mensagem padronizada por status e de-duplicação de erros idênticos.
   useEffect(() => {
-    setQueryErrorHandler((error) =>
-      toast({ title: "Erro", description: getErrorMessage(error), variant: "error" }),
-    );
+    setQueryErrorHandler((error) => {
+      const description = getApiErrorMessage(error);
+      const now = Date.now();
+      // Evita dois toasts para o mesmo erro em sequência (janela de 4s).
+      if (
+        lastError.current.message === description &&
+        now - lastError.current.at < 4000
+      ) {
+        return;
+      }
+      lastError.current = { message: description, at: now };
+      toast({ title: "Erro", description, variant: "error" });
+    });
     return () => setQueryErrorHandler(null);
   }, [toast]);
 
